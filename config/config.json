@@ -1,0 +1,26 @@
+{
+  "specialization": {
+  },
+
+  "middleware": {
+    "static": {
+      "module": {
+        "arguments": [ "path:./.build" ]
+      }
+    },
+
+    "router": {
+      "module": {
+        "arguments": [{ "directory": "path:./controllers" }]
+      }
+    },
+
+    "cors": {
+        "enabled": true,
+        "priority": 119,
+        "module": {
+            "name": "path:./middlewares/cors"
+        }
+    }
+  }
+}
