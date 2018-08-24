@@ -1,18 +1,13 @@
 'use strict';
 
-var app = require('./index');
-var http = require('http');
 require('dotenv').config();
-
-
+const app = require('./index');
+const http = require('http');
+const winston = require('./lib/logger.js');
 var server;
-
-/*
- * Create and start HTTP server.
- */
 
 server = http.createServer(app);
 server.listen(process.env.PORT || 8000);
 server.on('listening', function () {
-    console.log('Server listening on http://localhost:%d', this.address().port);
+  winston.info(`Server listening on http://localhost: ${this.address().port}`);
 });
