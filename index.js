@@ -7,6 +7,9 @@ var options, app;
 
 options = {
   onconfig: function (config, next) {
+    var middleware = config.get('middleware');
+    middleware.appsec.module.arguments[0].csrf = false;
+    config.set('middleware', middleware);
     next(null, config);
   }
 };
