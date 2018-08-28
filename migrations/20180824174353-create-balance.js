@@ -11,6 +11,9 @@ module.exports = {
       amount: {
         type: Sequelize.FLOAT
       },
+      version: {
+        type: Sequelize.STRING
+      },
       accountId: {
         type: Sequelize.INTEGER,
         references: {

@@ -1,5 +1,6 @@
 'use strict';
-const Account = require('../models').Account
+const winston = require('../lib/logger.js');
+const Balance = require('./').Balance
 
 module.exports = (sequelize, DataTypes) => {
   const Transaction = sequelize.define('Transaction', {
@@ -21,11 +22,11 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // Callbacks
-  Transaction.beforeCreate((transaction) => {
-    transaction.getAccount().then(acc => {
-      acc.update({ balance: acc.balance + transaction.amount })
-    })
-    return transaction;
+  Transaction.beforeCreate( async transaction => {
+    let account = await transaction.getAccount();
+    let balance = await account.getBalance();
+    let updated_balance = await balance.update({amount: balance.amount + transaction.amount});
   });
+
   return Transaction;
 };

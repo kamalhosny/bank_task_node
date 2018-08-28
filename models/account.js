@@ -1,21 +1,14 @@
 'use strict';
-const  Balance = require('../models').Balance
-const  Transaction = require('../models').Transaction
-
 module.exports = (sequelize, DataTypes) => {
+
+  // Model Definition
   const Account = sequelize.define('Account', {
     name: DataTypes.STRING,
-    balance: {
-      type: DataTypes.FLOAT,
-      validate: {
-        min: 0
-      }
-    }
   }, {});
 
   // Associations
   Account.associate = function(models) {
-    Account.hasMany(models.Balance);
+    Account.hasOne(models.Balance);
     Account.hasMany(models.Transaction);
     Account.hasMany(models.BalanceTransfer);
   };
@@ -23,13 +16,9 @@ module.exports = (sequelize, DataTypes) => {
 
   // Validations
 
-  // Callbacks
-  Account.beforeSave((account) => {
-    if (account.changed("balance") || account.isNewRecord) {
-      account.createBalance({
-        amount: account.balance
-      })
-    }
+  //Callbacks
+  Account.afterCreate((account) => {
+    account.createBalance({ amount: 0 });
     return account;
   });
 

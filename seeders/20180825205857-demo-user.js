@@ -5,22 +5,19 @@ module.exports = {
     return queryInterface.bulkInsert('Accounts', [
     {
       name: 'John Doe',
-      balance: 0,
       createdAt: new Date('2018-08-01'),
       updatedAt: new Date('2018-08-01')
     },
     {
       name: 'Kamal Hosny',
-      balance: 100,
       createdAt: new Date('2018-08-01'),
       updatedAt: new Date('2018-08-01')
     },
     {
       name: 'Carles Iborra',
-      balance: 10,
       createdAt: new Date('2018-08-01'),
       updatedAt: new Date('2018-08-01')
-    }], {});
+    }], { logging: true, individualHooks: true });
   },
 
   down: (queryInterface, Sequelize) => {

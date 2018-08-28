@@ -9,6 +9,15 @@ module.exports = (sequelize, DataTypes) => {
       references: {
         model: "accounts",
         key: 'id'
+      },
+      validate:{
+        async accountExists(acc_id){
+          let result = await sequelize.models.Account.findById(acc_id)
+          if(result){
+            return result;
+          }
+          throw new Error('There is no actual account having this id')
+        }
       }
     },
     toAccountId: {
@@ -16,31 +25,39 @@ module.exports = (sequelize, DataTypes) => {
       references: {
         model: "accounts",
         key: 'id'
+      },
+      validate:{
+        async accountExists(acc_id){
+          let result = await sequelize.models.Account.findById(acc_id)
+          if(result){
+            return result;
+          }
+          throw new Error('There is no actual account having this id')
+        }
       }
     }
-  }, {});
+  });
+
+  // Associations
   BalanceTransfer.associate = function(models) {
     BalanceTransfer.belongsTo(models.Account, { as: 'fromAccount', foreignKey: 'fromAccountId' });
     BalanceTransfer.belongsTo(models.Account, { as: 'toAccount', foreignKey: 'toAccountId' });
   };
 
   // Callbacks
-  BalanceTransfer.beforeCreate((transfer) => {
-    return sequelize.transaction(function (t) {
-      return Promise.all([
-        transfer.getFromAccount().then(acc => acc.createTransaction({ amount: -1 * transfer.transferedAmount })),
-        transfer.getToAccount().then(acc => acc.createTransaction({ amount: transfer.transferedAmount }))
-      ]).then(transactions => {
-        return transactions;
+  BalanceTransfer.beforeCreate(transfer => {
+    return sequelize.transaction(async function (t) {
+        let fromAccount = await transfer.getFromAccount()
+        let toAccount = await transfer.getToAccount()
+        await fromAccount.createTransaction({ amount: -1 * transfer.transferedAmount }, {transaction: t})
+        await toAccount.createTransaction({ amount: transfer.transferedAmount }, {transaction: t})
+      }).then( result =>{
+        winston.info(JSON.stringify(result));
+      }).catch( err => {
+        winston.error(err.message);
+        throw new Error(err.message);
       })
-
-    }).then( result => {
-      winston.info(JSON.stringify(result));
-    }).catch( err => {
-      winston.error(err);
-      throw new Error(err);
-    });
-    return transfer;
   });
+
   return BalanceTransfer;
 };

@@ -1,12 +1,14 @@
 'use strict';
-const Account = require('../models').Account
-
 module.exports = (sequelize, DataTypes) => {
+
+  // Model Definition
   const Balance = sequelize.define('Balance', {
     amount: {
       type: DataTypes.FLOAT,
       validate: {
-        min: 0
+        notLessThanZero(value){
+          if(value <= 0 ) throw new Error('Your Balance is not enough for this transaction')
+        },
       }
     },
     accountId: {
@@ -16,7 +18,9 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     }
-  }, {});
+  }, {
+    version: true
+  });
 
   // Associations
   Balance.associate = function(models) {
